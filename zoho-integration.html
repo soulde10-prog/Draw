@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Zoho Integration</title>
+    <script>
+        // Message passing between windows
+        window.addEventListener('message', function(event) {
+            if (event.origin !== 'https://your-zoho-creator-app-url.com') return; // Replace with your Zoho Creator app URL
+            // Handle incoming messages here
+            console.log('Message received:', event.data);
+        });
+
+        function sendMessageToZoho(data) {
+            window.parent.postMessage(data, 'https://your-zoho-creator-app-url.com'); // Replace with your Zoho Creator app URL
+        }
+
+        // Function for the roofing calculator
+        function calculateRoofingDimensions() {
+            const length = parseFloat(document.getElementById('length').value);
+            const width = parseFloat(document.getElementById('width').value);
+            const pitch = parseFloat(document.getElementById('pitch').value);
+
+            // Example roofing calculations
+            const area = length * width;
+            const pitchFactor = pitch / 12; // Basic pitch calculation (1/12)
+            const adjustedArea = area * (1 + pitchFactor);
+
+            document.getElementById('result').textContent = 'Adjusted Area: ' + adjustedArea.toFixed(2) + ' sq ft';
+
+            // Send result to Zoho Creator
+            sendMessageToZoho({ adjustedArea });
+        }
+
+        // Save/Load drawing functionality (pseudo-implementation)
+        function saveDrawing() {
+            const drawingData = getDrawingData(); // Implement getDrawingData() based on your drawing method
+            localStorage.setItem('drawingData', JSON.stringify(drawingData));
+            alert('Drawing saved!');
+        }
+
+        function loadDrawing() {
+            const drawingData = JSON.parse(localStorage.getItem('drawingData'));
+            if (drawingData) {
+                setDrawingData(drawingData); // Implement setDrawingData() based on your drawing method
+                alert('Drawing loaded!');
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Roofing Calculator</h1>
+    <label for='length'>Length (ft):</label>
+    <input type='number' id='length' required>
+    <label for='width'>Width (ft):</label>
+    <input type='number' id='width' required>
+    <label for='pitch'>Pitch (in):</label>
+    <input type='number' id='pitch' required>
+    <button onclick='calculateRoofingDimensions()'>Calculate</button>
+    <p id='result'></p>
+    <button onclick='saveDrawing()'>Save Drawing</button>
+    <button onclick='loadDrawing()'>Load Drawing</button>
+</body>
+</html>
