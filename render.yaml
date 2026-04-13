@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: roofing-backend
+    env: node
+    buildCommand: npm install
+    startCommand: node backend/server.js
