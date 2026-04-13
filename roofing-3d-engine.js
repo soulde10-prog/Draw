@@ -1,80 +1,68 @@
-'use strict';
+// Modern Roofing 3D Engine (2026 compatible style)
+import * as THREE from 'three';                    // use local three.module.js or CDN with importmap
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-// Import Three.js
-import * as THREE from 'three';
-
-/**
- * A 3D Engine for Roofing Types
- * v2.0 - Includes Gabled, Hipped, Flat, and Mansard Roofs
- */
-class Roofing3DEngine {
-    constructor() {
-        // Set up the scene, camera, and renderer
+export class ModernRoofing3DEngine {
+    constructor(containerId = 'threeContainer') {
+        this.container = document.getElementById(containerId);
         this.scene = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        this.renderer = new THREE.WebGLRenderer();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(this.renderer.domElement);
-        this.materials = this.initMaterials();
+        this.camera = new THREE.PerspectiveCamera(60, this.container.clientWidth / this.container.clientHeight, 0.1, 1000);
+        this.renderer = new THREE.WebGLRenderer({ antialias: true });
+        this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+        this.renderer.shadowMap.enabled = true;
+        this.container.appendChild(this.renderer.domElement);
+
+        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+        this.camera.position.set(0, 20, 40);
+        this.controls.update();
+
+        this.addLights();
+        this.createSampleRoofs();
+        this.animate();
     }
 
-    initMaterials() {
-        return {
-            wood: new THREE.MeshBasicMaterial({ color: 0x8B4513 }),
-            metal: new THREE.MeshBasicMaterial({ color: 0x808080 }),
-            concrete: new THREE.MeshBasicMaterial({ color: 0xA9A9A9 })
-        };
+    addLights() {
+        this.scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+        const sun = new THREE.DirectionalLight(0xffffff, 1);
+        sun.position.set(15, 30, 20);
+        sun.castShadow = true;
+        this.scene.add(sun);
     }
 
-    createGabledRoof() {
-        const geometry = new THREE.Geometry();
-        geometry.vertices.push(new THREE.Vector3(-1, 0, 0));
-        geometry.vertices.push(new THREE.Vector3(1, 0, 0));
-        geometry.vertices.push(new THREE.Vector3(0, 1, 1));
-        geometry.faces.push(new THREE.Face3(0, 1, 2));
-        const roof = new THREE.Mesh(geometry, this.materials.wood);
+    createSampleRoofs() {
+        // Gable Roof
+        const gableMat = new THREE.MeshStandardMaterial({ color: 0x8B5A2B, side: THREE.DoubleSide });
+        const base = new THREE.Mesh(new THREE.BoxGeometry(20, 1, 15), gableMat);
+        this.scene.add(base);
+
+        const roofGeo = new THREE.BufferGeometry();
+        const vertices = new Float32Array([
+            -10, 5, -7.5,   10, 5, -7.5,   0, 12, 0,
+            -10, 5,  7.5,   10, 5,  7.5,   0, 12, 0
+        ]);
+        roofGeo.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+        roofGeo.computeVertexNormals();
+        const roof = new THREE.Mesh(roofGeo, gableMat);
         this.scene.add(roof);
+
+        // Flat Torch-on
+        const flat = new THREE.Mesh(new THREE.BoxGeometry(18, 0.4, 14), new THREE.MeshStandardMaterial({color: 0x333333}));
+        flat.position.set(25, 3, 0);
+        this.scene.add(flat);
+
+        // Hip example (simplified pyramid)
+        const hip = new THREE.Mesh(new THREE.ConeGeometry(12, 9, 4), new THREE.MeshStandardMaterial({color: 0xA0522D}));
+        hip.position.set(-25, 6, 0);
+        this.scene.add(hip);
     }
 
-    createHippedRoof() {
-        const geometry = new THREE.Geometry();
-        geometry.vertices.push(new THREE.Vector3(-1, 0, 0));
-        geometry.vertices.push(new THREE.Vector3(1, 0, 0));
-        geometry.vertices.push(new THREE.Vector3(0, 1, 1));
-        geometry.vertices.push(new THREE.Vector3(-1, 0, -1));
-        geometry.vertices.push(new THREE.Vector3(1, 0, -1));
-        geometry.faces.push(new THREE.Face3(0, 1, 2));
-        geometry.faces.push(new THREE.Face3(0, 3, 2));
-        geometry.faces.push(new THREE.Face3(1, 4, 2));
-        const roof = new THREE.Mesh(geometry, this.materials.metal);
-        this.scene.add(roof);
-    }
-
-    createFlatRoof() {
-        const geometry = new THREE.BoxGeometry(2, 0.1, 2);
-        const roof = new THREE.Mesh(geometry, this.materials.concrete);
-        this.scene.add(roof);
-    }
-
-    createMansardRoof() {
-        // Mansard roof creation using geometry
-        const geometry = new THREE.Geometry();
-        // Add vertices and faces for a mansard roof
-        // (Custom implementation needed here)
-        const roof = new THREE.Mesh(geometry, this.materials.wood);
-        this.scene.add(roof);
-    }
-
-    render() {
-        requestAnimationFrame(this.render.bind(this));
+    animate() {
+        requestAnimationFrame(() => this.animate());
+        this.controls.update();
         this.renderer.render(this.scene, this.camera);
     }
+
+    // Future: addFrom2DScene(walls, roofs) { ... convert 2D data to 3D extrusions }
 }
 
-// Initialize the engine
-const engine = new Roofing3DEngine();
-engine.createGabledRoof();
-engine.createHippedRoof();
-engine.createFlatRoof();
-engine.createMansardRoof();
-engine.render();
+ // Usage: new ModernRoofing3DEngine();
