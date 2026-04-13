@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roofing Tools v1.5</title>
+</head>
+<body>
+    <h1>Roofing Tools v1.5</h1>
+    <form>
+        <label for="roofType">Select Roof Type:</label>
+        <select id="roofType" name="roofType">
+            <option value="gabled">Gabled</option>
+            <option value="flat">Flat</option>
+            <option value="hipped">Hipped</option>
+            <option value="shed">Shed</option>
+        </select>
+        <br>
+        <h2>Valley Tools</h2>
+        <label for="valleyLength">Valley Length:</label>
+        <input type="number" id="valleyLength" name="valleyLength">
+        <br>
+        <h2>Skylight Placement</h2>
+        <label for="skylightWidth">Skylight Width:</label>
+        <input type="number" id="skylightWidth" name="skylightWidth">
+        <br>
+        <h2>Flashings</h2>
+        <label for="flashingType">Select Flashing Type:</label>
+        <select id="flashingType" name="flashingType">
+            <option value="step">Step</option>
+            <option value="counter">Counter</option>
+            <option value="drip">Drip</option>
+        </select>
+        <br>
+        <h2>Undertile Timber</h2>
+        <label for="timberLength">Timber Length:</label>
+        <input type="number" id="timberLength" name="timberLength">
+        <br>
+        <h2>Kingpin Pitch Calculator</h2>
+        <label for="roofPitch">Roof Pitch (degrees):</label>
+        <input type="number" id="roofPitch" name="roofPitch">
+        <button type="button" onclick="calculatePitch()">Calculate</button>
+        <p id="pitchResult"></p>
+    </form>
+    <script>
+        function calculatePitch() {
+            let pitch = document.getElementById('roofPitch').value;
+            document.getElementById('pitchResult').innerText = `The pitch is ${pitch} degrees.`;
+        }
+    </script>
+</body>
+</html>
